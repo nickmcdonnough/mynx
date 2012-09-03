@@ -1,8 +1,8 @@
 # robbit
 
-## reddit api
-
 [robbit thread on reddit](http://www.reddit.com/r/Clojure/comments/z0o6u/robbit_reddit_apibots_in_clojure/)
+
+## reddit api
 
 The `reddit` namespace provides easy access to the reddit api. Highlights include infinite sequences of items from a given page:
 
