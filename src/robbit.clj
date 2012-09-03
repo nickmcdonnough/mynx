@@ -30,6 +30,7 @@
    :interval     5                                ; Minutes between successive runs.
    :last-run     (now)                            ; Date in the format "yyyy-MM-dd HH:mm:ss".
    :debug        false                            ; Responses will be logged but not actually performed.
+   :log          log
    :cancelled    (atom false)})                   ; Internal: the bot's thread will check this.
 
 (defn init-bot
@@ -56,7 +57,7 @@
                  (reply item text (bot :login))
                  :debug)]
     (update-last-run bot (item :time))
-    (log
+    ((bot :log)
       (item :permalink) "\n"
       (item (if (comment? item) :body :title)) "\n"
       "\n"
@@ -81,7 +82,7 @@
 
 (defn run-once [bot]
   (with-user-agent (bot :user-agent)
-    (log (-> bot :login :name) " running: " (now))
+    ((bot :log) (-> bot :login :name) " running: " (now))
     (let [items     (bot-items bot)
           responses (map (bot :handler) items)]
       (map' (fn [item response-map]
@@ -96,7 +97,7 @@
       (spaced spacer
         (when-not @(bot :cancelled)
           (try (run-once bot)
-            (catch Exception e (log e)))
+            (catch Exception e ((bot :log) e)))
           (recur))))))
 
 (defn stop [key]
