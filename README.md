@@ -14,7 +14,7 @@ Most of the functions are *fairly* self explanatory, but documentation isn't gre
 
 ## bots made easy
 
-<img src="http://i.imgur.com/l5K9A.jpg" width="200" align="right" />
+<img src="http://i.imgur.com/l5K9A.jpg" width="200" align="right" margin="10" />
 
 Then we have `robbit`, which lets you easily make bots which reply to links/comments. Here's a simple bot which replies to every comment on /r/clojure.
 
