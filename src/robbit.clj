@@ -35,8 +35,9 @@
 
 (defn init-bot
   "Merge with the default bot and get ready to run."
-  [bot] (-> (default-bot)
+  [bot key] (-> (default-bot)
             (merge bot)
+            (assoc :key key)
             (update-in [:last-run] atom)))
 
 (defn- author? [thing bot]
@@ -82,7 +83,7 @@
 
 (defn run-once [bot]
   (with-user-agent (bot :user-agent)
-    ((bot :log) (-> bot :login :name) " running: " (now))
+    ((bot :log) (bot :key) " running: " (now))
     (let [items     (bot-items bot)
           responses (map (bot :handler) items)]
       (map' (fn [item response-map]
@@ -106,7 +107,7 @@
 
 (defn start
   ([bot] (start bot (-> bot :login :name)))
-  ([bot key] (let [bot (init-bot bot)]
+  ([bot key] (let [bot (init-bot bot key)]
                (if (@bots key) (stop key))
                (future (run-bot bot))
                (swap! bots assoc key bot))))
