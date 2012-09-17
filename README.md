@@ -8,7 +8,7 @@
 
 The `reddit` namespace provides easy access to the reddit api. Highlights include infinite sequences of items from a given page:
 
-    (->> (subreddit "clojure") items (map :title) (take 150))
+    (->> "clojure" subreddit items (map :title) (take 150))
 
 (Titles of the 150 most "hot" items from the clojure subreddit)
 
