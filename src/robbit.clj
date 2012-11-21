@@ -1,5 +1,6 @@
 (ns robbit
-  (:use reddit util.time util.spacers))
+  (:use reddit util.time util.spacers)
+  (:require [reddit.url :as url]))
 
 ;; ------------------
 ;; Logging functions.
@@ -7,7 +8,7 @@
 
 (def map' (comp dorun map))
 
-(def log-str (atom ""))
+(defonce log-str (atom ""))
 
 (defn log [& s] (->> (swap! log-str #(str (apply str s)
   "\n----------------------------------------------------\n"
@@ -16,7 +17,9 @@
 
 (defn load-log [] (reset! log-str (slurp "log.txt")))
 
-(def bots (atom {}))
+(defn reset-log [] (reset! log-str ""))
+
+(defonce bots (atom {}))
 
 (defn- default-bot
   "A bot that doesn't do anything. Custom bots 'extend'
@@ -36,9 +39,9 @@
 (defn init-bot
   "Merge with the default bot and get ready to run."
   [bot key] (-> (default-bot)
-            (merge bot)
-            (assoc :key key)
-            (update-in [:last-run] atom)))
+                (merge bot)
+                (assoc :key key)
+                (update-in [:last-run] atom)))
 
 (defn- author? [thing bot]
   (= (thing :author) (-> bot :login :name)))
@@ -72,10 +75,13 @@
 
 (defn bot-items [bot]
   (->> (bot :subreddits)
-       ((if (= (bot :type) :link) subreddit-links
-                                  subreddit-comments))
+       ((if (= (bot :type) :link) url/subreddit-new
+                                  url/subreddit-comments))
        (items-since @(bot :last-run))
        (filter #(not (author? % bot)))))
+
+(defn print-log []
+  (println @log-str))
 
 ;; ------------------------
 ;; User-friendly functions.
