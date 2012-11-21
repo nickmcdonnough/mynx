@@ -23,14 +23,29 @@
 
 (defn login
   "Returns a login object {:name :cookie :modhash}
-  for passing to the request functions."
+  for passing to the request functions. If login
+  fails, it will contain an :errors key."
   [user pass]
-  (let [result (post (reddit api login)
-                     :params {"user" user, "passwd" pass, "api_type" "json"})]
+  (let [response (post (reddit api login)
+                       :params {"user" user, "passwd" pass, "api_type" "json"})
+        {:keys [errors data] :as response-json}
+                 (-> response :body (json/decode true) :json)]
+    (cond
+      ; Successful
+      (data :modhash) {:name    user
+                       :cookies (response :cookies)
+                       :modhash (data :modhash)}
+      ; Unsuccessful
+      (seq errors)    response-json
+      :else           {:errors  :unknown
+                       :reponse response
+                       :data    response-json})))
 
-    {:name    user
-     :cookies (result :cookies)
-     :modhash (-> result :body (json/decode true) :json :data :modhash)}))
+(defn login-success?
+  "If the login was successful, returns it.
+  Otherwise nil."
+  [login]
+  (if (login :modhash) login))
 
 ;; ----------------
 ;; Retreiving Items
