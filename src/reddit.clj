@@ -1,5 +1,5 @@
 (ns reddit
-  (:use      reddit.core util.spacers util.time)
+  (:use      reddit.core util.spacers)
   (:require [clojure.string :as str ]
             [cheshire.core  :as json]
             [reddit.url :refer (reddit)]))
@@ -59,6 +59,8 @@
                        :after (:name item)
                        :sort  "new"}))
 
+;; This should be able to accept params.
+
 (defn items
   "Returns a lazy sequence of all items at the given
   url, including subsequent pages. API calls spaced."
@@ -69,17 +71,29 @@
         (if-not (empty? s)
           (concat s (items url (last s))))))))
 
-; Get rid of clj-time
 (defn items-since
   "Takes `items` posted after the specified DateTime object."
-  [date url] (take-while #(after? (% :time) date) (items url)))
+  [date url] (take-while #(.after (% :time) date) (items url)))
 
 ;; --------------
 ;; Links/comments
 ;; --------------
 
+;; # Inspection
+
 (defn comment? [thing] (= (:kind thing) :comment))
 (defn link?    [thing] (= (:kind thing) :link   ))
+
+(defn author? [thing user] (= (thing :author) user))
+
+(defn deleted-comment? [comment]
+  (and (author? comment   "[deleted]")
+       (= (comment :body) "[deleted]")))
+
+(defn first-reply [thing]
+  (-> thing :replies first))
+
+;; # Retrieval
 
 (defn link-from-url [url]
   (let [data     (get-parsed url)
@@ -87,8 +101,10 @@
         comments (second data)]
     (assoc link :replies comments)))
 
-(defn first-reply [thing]
-  (-> thing :replies first))
+(def comments-from-url (comp :replies link-from-url))
+
+;; Fix context bug
+(def comment-from-url (comp first-reply link-from-url))
 
 (defn with-replies
   "Reload the comment/link (e.g. from `items`)
@@ -101,6 +117,8 @@
       (comment? thing) (-> thing (merge (first comments)))
       (link?    thing) (-> thing (merge link) (assoc :replies comments))
       :else            thing)))
+
+;; # Actions
 
 (defn reply
   "Parent should be a link/comment object, reply is a string.
@@ -118,17 +136,11 @@
       #".error.DELETED_COMMENT.field-parent" :parent-deleted
       (response :body))))
 
-; (defn reply-by?
-;   "Check if a link/comment has been directly replied to by a given
-;   account. Not reliable, see `with-replies`."
-;   [thing account]
-;   (some #(= (% :author) account) ((with-replies thing) :replies)))
-
 (defn vote
   "Vote :up, :down, or :none on a link/comment."
   [item direction login]
   (post (reddit api vote)
-        :login login
+        :login  login
         :params {:id  (item :name)
                  :dir (direction
                         {:up 1, :none 0, :down -1})}))
@@ -139,5 +151,5 @@
 
 (defn me
   "Data about the currently logged in user."
-  [login] (parse (get-json (reddit api me)
-                           :login login)))
+  [login] (get-parsed (reddit api me)
+                      :login login))
