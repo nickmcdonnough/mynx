@@ -1,3 +1,5 @@
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=one_more_minute&url=https://github.com/one-more-minute/robbit&title=robbit&language=&tags=github&category=software)
+
 # robbit
 
 [robbit thread on reddit](http://www.reddit.com/r/Clojure/comments/z0o6u/robbit_reddit_apibots_in_clojure/)
