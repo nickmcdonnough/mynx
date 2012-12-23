@@ -13,14 +13,14 @@
 ;; Parsing
 ;; -------
 
-(defn secs->date [t]
+(defn- secs->date [t]
   (java.util.Date. (long (* t 1000))))
 
-(defn trim-id
+(defn- trim-id
   "Turns 't3_xvzdh' into 'xvzdh'. * CHANGE THIS"
   [s] (second (re-find #"_(.+)" s)))
 
-(defn comment-permalink [{:keys [subreddit link_id id] :as comment}]
+(defn- comment-permalink [{:keys [subreddit link_id id] :as comment}]
   (str "http://www.reddit.com/r/" subreddit "/comments/" (trim-id link_id) "/_/" id))
 
 ;; All reddit objects have a :kind of :link, :comment, or :account, along with relevant data.
@@ -81,15 +81,6 @@
 
 (def ^:dynamic *user-agent* "reddit.clj")
 
-; (defn request
-;   "Request of type :get or :post."
-;   [type url & {:keys [params login user-agent]}]
-;   (let [request (type {:get  http/get
-;                        :post http/post})]
-;     (request url {:headers       {"User-Agent" (or user-agent *user-agent*)}
-;                   :cookies       (:cookies login)
-;                   :query-params  (merge {:uh (:modhash login)} params)})))
-
 (defn request
   "Request of type :get or :post."
   [method url & {:keys [params login user-agent]}]
@@ -119,12 +110,12 @@
 ;; Caching
 ;; -------
 
-(def get-json' get-json)
+(def ^:private get-json' get-json)
 
 (def ^:private caching false)
 
 (defn enable-caching
-  "Enable caching of `get` requests. Each
+  "Enable caching of `get-json` requests. Each
   page will be cached for 2 minutes. Useful
   for testing, since multiple requests of
   the same page will cause reddit to 304."
