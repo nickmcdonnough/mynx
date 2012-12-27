@@ -6,7 +6,7 @@
 
 (defmulti handle-response
   "This is applied to each pair of the response map, dispatching
-  based on key. eg if the response map contains `{:reply \"string\"}`,
+  based on key. eg if ((bot :handler) item) returns `{:reply \"string\"}`,
   `(handle-response bot item \"string\")` is called, dispatching to
   :reply."
   (fn [bot item data] (:response-type (meta item))))

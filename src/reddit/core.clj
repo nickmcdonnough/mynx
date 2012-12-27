@@ -26,11 +26,14 @@
 ;; All reddit objects have a :kind of :link, :comment, or :account, along with relevant data.
 ;; Comments and links also get :time, with a DateTime object.
 
-(defmulti parse #(cond
-                   (vector? %) :vec
-                   (string? %) :atom
-                   (nil?    %) :atom
-                   :else       (:kind %)))
+(defmulti parse
+  "Takes reddit's raw objects (as parsed from JSON)
+  and turns them into a useful form."
+  #(cond
+     (vector? %) :vec
+     (string? %) :atom
+     (nil?    %) :atom
+     :else       (:kind %)))
 (defmethod parse :vec [items]
   (map parse items))
 (defmethod parse :atom [a] a)
@@ -79,10 +82,16 @@
 ;; Low-level requests
 ;; ------------------
 
-(def ^:dynamic *user-agent* "reddit.clj")
+(def ^:dynamic *user-agent*
+  "A user agent string used by `request`."
+  "reddit.clj")
 
 (defn request
-  "Request of type :get or :post."
+  "Request of type :get or :post.
+  Options:
+      :params     - HTTP parameters
+      :login      - reddit login object
+      :user-agent - overrides `*user-agent*`"
   [method url & {:keys [params login user-agent]}]
   (http/request {:method        method
                  :url           url
@@ -91,7 +100,8 @@
                  :query-params  (merge {:uh (:modhash login)} params)}))
 
 (defn get-json
-  "Retrieve and decode json from a web page. Takes a url and optional login and params.
+  "Retrieve and decode json from a web page.
+  See `request` for options.
   .json extension added automatically."
   ([url & opts]
    (-> (apply request :get (str url ".json") opts)
@@ -102,7 +112,8 @@
   [& args] (parse (apply get-json args)))
 
 (defn post
-  "Post with user-agent and login. Returns full clj-http response."
+  "Post with user-agent and login. Returns full clj-http response.
+  See `request` for options."
   [url & opts]
   (apply request :post url opts))
 

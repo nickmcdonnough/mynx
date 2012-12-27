@@ -35,6 +35,18 @@
 
 (def line "---")
 
+(def Aliases
+  "The formatting functions have aliases to make
+  using them more readable.
+  ---      -   line
+  i        -   italic
+  ss       -   superscript
+  sn       -   superscript-n
+  l        -   hyperlink
+  p        -   paragraphs
+  q        -   quotify"
+  nil)
+
 (def --- line)
 (def i italic)
 (def ss superscript)

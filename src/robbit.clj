@@ -47,23 +47,31 @@
 ;; User-friendly functions.
 ;; ------------------------
 
-(defmacro debug [& forms]
+(defmacro debug
+  "Debug mode - responses won't actually be performed."
+  [& forms]
   `(binding [*debug* true]
      ~@forms))
 
-(defmacro with-log [log & forms]
+(defmacro with-log
+  "Provide a function to be used for logging."
+  [log & forms]
   `(binding [*log* ~log]
      ~@forms))
 
 (defn init-bot
-  "Merge with the default bot and get ready to run."
+  "Merge with the default bot and get ready to run.
+  Don't use with `start`."
   [bot key] (-> (default-bot)
                 (merge bot)
                 (assoc :key key)
                 (assoc-in [:last-run] (atom (or (bot :last-run)
                                                 (subtract-mins (now) (get bot :delay 0)))))))
 
-(defn run-once [{:keys [key handler user-agent retry] :as bot}]
+(defn run-once
+  "Retrieve aproppriate items for a bot,
+  map `handler` over them, run the response."
+  [{:keys [key handler user-agent retry] :as bot}]
   (with-user-agent user-agent
     (let [items     (bot-items bot)
           responses (pmap handler items)]
@@ -76,7 +84,9 @@
                     response-map))
             items responses))))
 
-(defn run-bot [{:keys [key interval cancelled] :as bot}]
+(defn run-bot
+  "Repeatedly `run-once`."
+  [{:keys [key interval cancelled] :as bot}]
   (let [spacer (spacer (* interval 60 1000))]
     (loop []
       (spaced spacer
@@ -86,10 +96,12 @@
           (recur))))))
 
 (defn stop [key]
+  "Stop running the bot specified by `key`."
   (reset! (-> @bots key :cancelled) true)
   (swap! bots dissoc key))
 
 (defn start
+  "Initialise a bot and begin running it."
   ([bot] (start bot (-> bot :login :name)))
   ([bot key]
     (if (login-success? (bot :login))

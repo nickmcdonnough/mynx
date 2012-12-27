@@ -2,7 +2,9 @@
 
 (defonce log-str (atom ""))
 
-(defn file-log [& s]
+(defn file-log
+  "Append strings to log.txt"
+  [& s]
   (->> #(str %
   	(java.util.Date.) "\n"
              (apply str s)
@@ -10,10 +12,15 @@
         (swap! log-str)
         (spit "log.txt")))
 
-(defn print-fn [& s]
+(defn print-fn
+  "Concat and print the strings."
+  [& s]
   (println (apply str s)))
 
-(def ^:dynamic *log* file-log)
+(def ^:dynamic *log*
+  "`robbit` and `robbit.reponse` use this function
+  for logging."
+  file-log)
 
 (defn load-log [] (reset! log-str (slurp "log.txt")))
 
