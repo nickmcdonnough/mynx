@@ -1,6 +1,8 @@
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=one_more_minute&url=https://github.com/one-more-minute/robbit&title=robbit&language=&tags=github&category=software)
 
-    [robbit "1.0.0"]
+    [robbit "1.0.0-SNAPSHOT"]
+
+(I know it says "snapshot", but you can consider that a final 1.0.0 release - I just can't get signing to work properly at the moment)
 
 # reddit.clj - the reddit api
 
@@ -56,8 +58,6 @@ Then we have `robbit`, which lets you easily make reddit bots. Here's a simple b
                       {:reply (str "Great comment, " (comment :author) "!")
                        :vote  :up})
         :login      (reddit/login "username" "password")}))
-
-Yeah, but please, *don't* run that.
 
 That's about as simple as it gets, but you'll probably want to make use of some of the other options:
 
