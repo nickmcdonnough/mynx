@@ -52,10 +52,10 @@ I haven't tried to cover every possible API function. Instead, I've tried to pro
 Then we have `robbit`, which lets you easily make reddit bots. Here's a simple bot which replies to every new comment.
 
     (robbit/start
-      ({:handler    (fn [comment]
-                      {:reply (str "Great comment, " (comment :author) "!")
-                       :vote  :up})
-        :login      (reddit/login "username" "password")}))
+      {:handler    (fn [comment]
+                     {:reply (str "Great comment, " (comment :author) "!")
+                      :vote  :up})
+       :login      (reddit/login "username" "password")})
 
 That's about as simple as it gets, but you'll probably want to make use of some of the other options:
 
