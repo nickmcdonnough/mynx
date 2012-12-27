@@ -1,13 +1,19 @@
 (ns robbit.log)
 
-(def ^:private map' (comp dorun map))
-
 (defonce log-str (atom ""))
 
-(defn log [& s] (->> (swap! log-str #(str (apply str s)
-  "\n----------------------------------------------------\n"
-                                          %))
-                     (spit "log.txt")))
+(defn file-log [& s]
+  (->> #(str %
+  	(java.util.Date.) "\n"
+             (apply str s)
+             "\n----------------------------------------------------\n")
+        (swap! log-str)
+        (spit "log.txt")))
+
+(defn print-fn [& s]
+  (println (apply str s)))
+
+(def ^:dynamic *log* file-log)
 
 (defn load-log [] (reset! log-str (slurp "log.txt")))
 
