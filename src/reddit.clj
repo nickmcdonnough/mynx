@@ -19,11 +19,13 @@
 ;; --------------
 
 (defmacro with-user-agent
+  "All api requests will be made with the
+  given user agent string."
   [agent & code]
   `(binding [*user-agent* ~agent] ~@code))
 
 (defn login
-  "Returns a login object {:name :cookie :modhash}
+  "Returns a login object (`{:name :cookie :modhash}`)
   for passing to the request functions. If login
   fails, it will contain an :errors key."
   [user pass]
@@ -63,7 +65,12 @@
       (if-not (empty? s)
         (concat s (items url :params (assoc params :after (-> s last :name))))))))
 
-(defn take-while-chunked [pred coll]
+(defn ^:no-doc take-while-chunked
+  "Sometimes links on /new will be out of order -
+  this deals with that by requiring that n items
+  in a row fail the predicate (although only matches
+  will be returned)."
+  [pred coll]
   (lazy-seq
     (let [first (filter pred (take 10 coll))
           rest  (drop 10 coll)]
@@ -80,13 +87,22 @@
 
 ;; # Inspection
 
-(defn comment? [thing] (= (:kind thing) :comment))
-(defn link?    [thing] (= (:kind thing) :link   ))
+(defn comment?
+  "Test if the reddit object is a comment."
+  [thing] (= (:kind thing) :comment))
+(defn link?
+  "Test if the reddit object is a link."
+  [thing] (= (:kind thing) :link))
 
-(defn author? [thing user] (= (thing :author) user))
+(defn author?
+  "Test if the reddit object was authored by
+  the given username."
+  [thing user] (= (thing :author) user))
 
-(defn deleted-comment? [comment]
-  (and (author? comment   "[deleted]")
+(defn deleted-comment?
+  "Check if a comment has been removed."
+  [comment]
+  (or  (nil? (comment :body))
        (= (comment :body) "[deleted]")))
 
 (defn x-post?
@@ -114,29 +130,17 @@
   Currently ignores context param."
   (comp first get-comments))
 
-(defn with-replies
-  "Reload the comment/link (e.g. from `items`)
-  with :replies data. Only loads one page."
-  [thing]
-  (let [data     (-> thing :permalink get-parsed)
-        link     (ffirst data)
-        comments (second data)]
-    (cond
-      (comment? thing) (-> thing (merge (first comments)))
-      (link?    thing) (-> thing (merge link) (assoc :replies comments))
-      :else            thing)))
-
 ;; # Actions
 
 (defn reply
   "Parent should be a link/comment object, reply is a string.
   Returns a keyword indicating either successfully `:submitted`
   or an error."
-  [parent reply login]
+  [parent text login]
   (let [response (post (reddit api comment)
                        :login login
                        :params {:thing_id (parent :name)
-                                :text     reply})]
+                                :text     text})]
     (condp re-find (response :body)
       #"contentText"                         :submitted
       #".error.RATELIMIT.field-ratelimit"    :rate-limit
