@@ -1,4 +1,4 @@
-(defproject robbit "1.0.0-SNAPSHOT"
+(defproject robbit "1.0.0"
   :description "reddit api and bots made easy."
   :url "https://github.com/one-more-minute/robbit"
   :license {:name "Eclipse Public License"

@@ -1,6 +1,4 @@
-    [robbit "1.0.0-SNAPSHOT"]
-
-(I know it says "snapshot", but you can consider that a final 1.0.0 release - I just can't get signing to work properly at the moment)
+`[robbit "1.0.0"]`
 
 # reddit.clj - the reddit api
 
