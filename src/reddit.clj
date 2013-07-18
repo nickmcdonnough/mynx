@@ -146,6 +146,7 @@
       #".error.RATELIMIT.field-ratelimit"    :rate-limit
       #".error.USER_REQUIRED"                :user-required
       #".error.DELETED_COMMENT.field-parent" :parent-deleted
+      #".error.DELETED_LINK.field-parent"    :parent-deleted
       (response :body))))
 
 (defn vote
