@@ -45,6 +45,8 @@ I haven't tried to cover every possible API function. Instead, I've tried to pro
 
 # robbit - bots made easy
 
+**Note - robbit is deprecated and will soon be removed. I'm working on something which will let you write similar bots in a much more powerful and interesting way, so stay tuned.**
+
 <img src="http://i.imgur.com/l5K9A.jpg" width="200" align="right" margin="10px" />
 
 Then we have `robbit`, which lets you easily make reddit bots. Here's a simple bot which replies to every new comment.
