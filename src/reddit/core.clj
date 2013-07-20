@@ -5,7 +5,7 @@
   retrieval of json / reddit objects from pages,
   and posting of requests. Specific API calls
   are built on top of these."
-  (:use      util.spacers)
+  (:use      reddit.util)
   (:require [clj-http.client :as http]
             [cheshire.core   :as json]))
 

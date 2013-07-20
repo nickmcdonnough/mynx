@@ -1,6 +1,6 @@
 (ns reddit
   "High level interface to reddit."
-  (:use      reddit.core util.spacers)
+  (:use      [reddit core util])
   (:require [clojure.string :as str ]
             [cheshire.core  :as json]
             [reddit.url :refer (reddit)]))

@@ -1,4 +1,4 @@
-(ns util.spacers
+(ns reddit.util
   "Space apart code execution in a reliable, optimal
   and thread-aware way.")
 
