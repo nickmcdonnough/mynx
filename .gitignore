@@ -10,3 +10,4 @@ pom.xml
 .lein-plugins
 *.sublime-workspace
 log.txt
+.lein-repl-history
