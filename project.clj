@@ -1,9 +1,10 @@
-(defproject robbit "1.0.0"
-  :description "reddit api and bots made easy."
-  :url "https://github.com/one-more-minute/robbit"
+(defproject robbit "2.0.0-SNAPSHOT"
+  :description "reddit api"
+  :url "https://github.com/one-more-minute/mynx"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.4.0"]
-                 [clj-http            "0.5.2"]
-                 [cheshire            "4.0.1"]]
-  :codox {:output-dir "docs/codox"})
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [clj-http            "0.7.5"]
+                 [cheshire            "5.2.0"]
+                 [slingshot          "0.10.3"]
+                 [one_more_minute/clarity "0.1.1"]])
