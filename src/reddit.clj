@@ -1,6 +1,6 @@
 (ns reddit
   "High level interface to reddit."
-  (:use      [reddit core util])
+  (:use      [reddit core util] slingshot.slingshot)
   (:require [clojure.string :as str ]
             [cheshire.core  :as json]
             [reddit.url :refer (reddit)]))
@@ -137,17 +137,21 @@
   Returns a keyword indicating either successfully `:submitted`
   or an error."
   [parent text login]
-  (let [response (post (reddit api comment)
-                       :login login
-                       :params {:thing_id (parent :name)
-                                :text     text})]
-    (condp re-find (response :body)
-      #"contentText"                         :submitted
-      #".error.RATELIMIT.field-ratelimit"    :rate-limit
-      #".error.USER_REQUIRED"                :user-required
-      #".error.DELETED_COMMENT.field-parent" :parent-deleted
-      #".error.DELETED_LINK.field-parent"    :parent-deleted
-      (response :body))))
+  (try+
+    (let [response (post (reddit api comment)
+                         :login login
+                         :params {:thing_id (parent :name)
+                                  :text     text})]
+      (condp re-find (response :body)
+        #"contentText"                         :submitted
+        #".error.RATELIMIT.field-ratelimit"    :rate-limit
+        #".error.USER_REQUIRED"                :user-required
+        #".error.DELETED_COMMENT.field-parent" :parent-deleted
+        #".error.DELETED_LINK.field-parent"    :parent-deleted
+        (response :body)))
+    (catch [:status 504] _ :timeout)
+    (catch [:status 403] _ :forbidden)
+    (catch Object e e)))
 
 (defn vote
   "Vote :up, :down, or :none on a link/comment."
