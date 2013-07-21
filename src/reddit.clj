@@ -10,16 +10,6 @@
 (use-clarity)
 (clarity
 
-def api-spacer (spacer 2000)
-defmacro api-call
-  "Code blocks wrapped with `api-call` will not execute within
-  two seconds of each other, eg
-      `(pmap #(api-call (println %)) (range 5))`
-  takes 8 s, with 2 s between each call to `println`. All calls
-  to the reddit api should use this macro."
-  [& forms]
-  `(spaced api-spacer ~@forms)
-
 ;; --------------
 ;; Authentication
 ;; --------------
@@ -50,8 +40,6 @@ defn login-success?
   [login]
   if (login :modhash) login
 
-def ^:dynamic *login* nil
-
 defn login! [user pass]
   alter-var-root #'*login* : λ login user pass
 
@@ -67,9 +55,9 @@ defn items
   url, including subsequent pages. API calls spaced."
   [url & {:keys [params]}]
   lazy-seq
-    let [s (api-call (get-parsed url :params (merge {:limit 1000
-                                                     :sort  "new"}
-                                                    params)))]
+    let [s (get-parsed url :params (merge {:limit 1000
+                                           :sort  "new"}
+                                          params)))]
       if-not (empty? s)
         concat s (items url :params (assoc params :after (-> s last :name)))
 
@@ -160,7 +148,7 @@ defn reply
   [parent text & [login]]
   try+
     let [response (post (reddit api comment)
-                        :login (or login *login*)
+                        :login  login
                         :params {:thing_id (parent :name)
                                  :text     text})]
       (condp re-find (response :body)
@@ -178,7 +166,7 @@ defn vote
   "Vote :up, :down, or :none on a link/comment."
   [item direction & [login]]
   (post (reddit api vote)
-        :login  (or login *login*)
+        :login  login
         :params {:id  (item :name)
                  :dir (direction
                         {:up 1, :none 0, :down -1})})
@@ -192,7 +180,7 @@ defn me
   from `/api/me.json`."
   [& [login]]
   get-parsed (reddit api me)
-             :login (or login *login*))
+             :login (or login *login*)
 
 defn get-user
   "Account information for a user."

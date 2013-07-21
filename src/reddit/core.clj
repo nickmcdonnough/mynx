@@ -6,7 +6,8 @@
   and posting of requests. Specific API calls
   are built on top of these."
   (use      reddit.util
-            clarity.core)
+            clarity.core
+            slingshot.slingshot)
   (require [clj-http.client :as http]
            [cheshire.core   :as json]))
 
@@ -88,9 +89,13 @@ defmethod parse "more" [{more :data}]
 ;; Low-level requests
 ;; ------------------
 
+def ^:private api-spacer (spacer 2000)
+
 def ^:dynamic *user-agent*
   "A user agent string used by `request`."
   "reddit.clj"
+
+def ^:dynamic *login* nil
 
 defn request
   "Request of type :get or :post.
@@ -98,14 +103,19 @@ defn request
       :params     - HTTP parameters
       :login      - reddit login object
       :user-agent - overrides `*user-agent*`"
-  [method url & {:keys [params login user-agent]}]
-  http/request {:method        method
-                :url           url
-                :headers       {"User-Agent" (or user-agent *user-agent*)}
-                :cookies       (:cookies login)
-                :query-params  (merge {:uh (:modhash login)
-                                       :rand-int (rand-int 1000000)}
-                                      params)}
+  [method url & {:keys [params login user-agent] :or {login *login* user-agent *user-agent*} :as opts}]
+  try+
+    spaced api-spacer
+      http/request {:method        method
+                    :url           url
+                    :headers       {"User-Agent" user-agent}
+                    :cookies       (:cookies login)
+                    :query-params  (merge {:uh (:modhash login)
+                                           :rand-int (rand-int 1000000)}
+                                          params)}
+
+    catch [:status 504] _ (Thread/sleep 2000) (apply-opts request method url opts)
+    catch [:status 500] _ (Thread/sleep 2000) (apply-opts request method url opts)
 
 defn get-json
   "Retrieve and decode json from a web page.

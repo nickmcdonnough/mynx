@@ -52,4 +52,4 @@
 (defn apply-opts [f & args]
   (let [opts (last    args)
         args (butlast args)]
-    (apply f args (reduce concat opts))))
+    (apply f (concat args (reduce concat opts)))))
