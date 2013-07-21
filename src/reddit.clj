@@ -2,7 +2,7 @@
   "High level interface to reddit."
   (:use [reddit core util]
          slingshot.slingshot
-         clarity.core)
+         [clarity core utils])
   (:require [clojure.string :as str ]
             [cheshire.core  :as json]
             [reddit.url :refer (reddit)]))
@@ -50,6 +50,14 @@ defn login-success?
   [login]
   if (login :modhash) login
 
+def ^:dynamic *login* nil
+
+defn login! [user pass]
+  alter-var-root #'*login* : λ login user pass
+
+defn set-user-agent! [agent]
+  alter-var-root #'*user-agent* : λ agent
+
 ;; ----------------
 ;; Retreiving Items
 ;; ----------------
@@ -90,7 +98,7 @@ defn new-items
     lazy-seq
       let [items (reverse (items-since url time))
            time  (->> items (map :time) (cons time) latest)]
-        concat items (new-items url time)
+        concat items : new-items url time
 
 ;; --------------
 ;; Links/comments
@@ -148,10 +156,10 @@ defn reply
   "Parent should be a link/comment object, reply is a string.
   Returns a keyword indicating either successfully `:submitted`
   or an error."
-  [parent text login]
+  [parent text & [login]]
   try+
     let [response (post (reddit api comment)
-                        :login login
+                        :login (or login *login*)
                         :params {:thing_id (parent :name)
                                  :text     text})]
       (condp re-find (response :body)
@@ -167,9 +175,9 @@ defn reply
 
 defn vote
   "Vote :up, :down, or :none on a link/comment."
-  [item direction login]
+  [item direction & [login]]
   (post (reddit api vote)
-        :login  login
+        :login  (or login *login*)
         :params {:id  (item :name)
                  :dir (direction
                         {:up 1, :none 0, :down -1})})
@@ -181,8 +189,9 @@ defn vote
 defn me
   "Data about the currently logged in user
   from `/api/me.json`."
-  [login] (get-parsed (reddit api me)
-                      :login login)
+  [& [login]]
+  get-parsed (reddit api me)
+                     :login (or login *login*))
 
 defn get-user
   "Account information for a user."
