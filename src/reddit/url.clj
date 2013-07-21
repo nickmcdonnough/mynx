@@ -8,11 +8,12 @@
 ;; Subreddits can be provided in the form
 ;; `"subreddit"` or `["sr1" "sr2" ...]`
 
-(defn subreddit
-  "Links page for a given subreddit(s) (string or vector of strings)."
-  [names]
-  (let [names (if (string? names) [names] names)]
-    (str (reddit r) "/" (str/join "+" names))))
+(defn subreddit [x]
+  (cond
+    (some #(% x) [symbol? keyword? string?])
+      (str (reddit r) "/" (name x))
+    :else
+      (subreddit (str/join "+" (map name x)))))
 
 (defn subreddit-comments
   "Comments page url for a given subreddit(s)."
