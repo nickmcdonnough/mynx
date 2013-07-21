@@ -97,7 +97,9 @@
                  :url           url
                  :headers       {"User-Agent" (or user-agent *user-agent*)}
                  :cookies       (:cookies login)
-                 :query-params  (merge {:uh (:modhash login)} params)}))
+                 :query-params  (merge {:uh (:modhash login)
+                                        :rand-int (rand-int 1000000)}
+                                       params)}))
 
 (defn get-json
   "Retrieve and decode json from a web page.
