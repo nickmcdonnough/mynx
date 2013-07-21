@@ -142,7 +142,7 @@ defn post
 
 def ^:private get-json' get-json
 
-def ^:private caching false
+def ^:private broke ; true if you've got no cache
 
 defn enable-caching
   "Enable caching of `get-json` requests. Each
@@ -150,14 +150,14 @@ defn enable-caching
   for testing, since multiple requests of
   the same page will cause reddit to 304."
   []
-  when-not caching
+  when broke
     def caching true
     def get-json (memoize' get-json (* 2 60 1000))
 
 defn disable-caching
   "Disable caching of requests."
   []
-  when caching
+  when-not broke
     def caching false
     def get-json get-json'
 
