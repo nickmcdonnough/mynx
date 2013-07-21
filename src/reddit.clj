@@ -18,12 +18,6 @@
 ;; Authentication
 ;; --------------
 
-(defmacro with-user-agent
-  "All api requests will be made with the
-  given user agent string."
-  [agent & code]
-  `(binding [*user-agent* ~agent] ~@code))
-
 (defn login
   "Returns a login object (`{:name :cookie :modhash}`)
   for passing to the request functions. If login
@@ -65,7 +59,7 @@
       (if-not (empty? s)
         (concat s (items url :params (assoc params :after (-> s last :name))))))))
 
-(defn ^:no-doc take-while-chunked
+(defn ^:private take-while-chunked
   "Sometimes links on /new will be out of order -
   this deals with that by requiring that n items
   in a row fail the predicate (although only matches
@@ -79,7 +73,7 @@
 
 (defn items-since
   "Takes all `items` posted after the specified Date."
-  [date url] (take-while-chunked #(.after (% :time) date) (items url)))
+  [url date] (take-while-chunked #(.after (% :time) date) (items url)))
 
 ;; --------------
 ;; Links/comments
@@ -176,17 +170,3 @@
   "Account information for a user."
   [username]
   (get-parsed (str (reddit user) "/" username "/about")))
-
-(defn user-comments
-  "Lazy seq of all comments by a user.
-  Can take params e.g.
-      (user-comments \"user\" :params {:sort \"top\"
-                                       :t    \"all\"})"
-  [username & opts]
-  (apply items (str (reddit user) "/" username "/comments") opts))
-
-(defn by-subreddit
-  "Filter comments by subreddit/set of subreddits."
-  [comments subreddits]
-  (let [subreddits (if (set? subreddits) subreddits #{subreddits})]
-    (filter (comp subreddits :subreddit) comments)))
