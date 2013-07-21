@@ -109,6 +109,7 @@ defn new-items
 defn comment?
   "Test if the reddit object is a comment."
   [thing] (= (:kind thing) :comment)
+
 defn link?
   "Test if the reddit object is a link."
   [thing] (= (:kind thing) :link)
@@ -191,11 +192,11 @@ defn me
   from `/api/me.json`."
   [& [login]]
   get-parsed (reddit api me)
-                     :login (or login *login*))
+             :login (or login *login*))
 
 defn get-user
   "Account information for a user."
   [username]
-  (get-parsed (str (reddit user) "/" username "/about"))
+  get-parsed : str (reddit user) "/" username "/about"
 
 )
