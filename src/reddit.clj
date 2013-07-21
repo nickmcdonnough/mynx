@@ -100,11 +100,9 @@ defn new-items
            time  (->> items (map :time) (cons time) latest)]
         concat items : new-items url time
 
-;; --------------
-;; Links/comments
-;; --------------
-
-;; # Inspection
+;; ----------
+;; Inspection
+;; ----------
 
 defn comment?
   "Test if the reddit object is a comment."
@@ -151,7 +149,9 @@ def get-comment
   Currently ignores context param."
   comp first get-comments
 
-;; # Actions
+;; -------
+;; Actions
+;; -------
 
 defn reply
   "Parent should be a link/comment object, reply is a string.
