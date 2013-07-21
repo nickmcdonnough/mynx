@@ -75,6 +75,15 @@
   "Takes all `items` posted after the specified Date."
   [url date] (take-while-chunked #(.after (% :time) date) (items url)))
 
+(defn ^:private latest [ts] (->> ts (sort-by #(.getTime %)) last))
+
+(defn new-items
+  ([url] (new-items url (java.util.Date.)))
+  ([url time]
+    (let [items (reverse (items-since url time))
+          time  (->> items (map :time) (cons time) latest)]
+      (lazy-cat items (new-items url time)))))
+
 ;; --------------
 ;; Links/comments
 ;; --------------
