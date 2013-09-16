@@ -1,80 +1,83 @@
-`[robbit "1.0.0"]`
+# Mynx
 
-# reddit.clj - the reddit api
+    [mynx "2.0.0"]
 
-The `reddit` namespace provides easy access to the reddit api. Highlights include infinite sequences of items from a given page:
+Mynx is an easy, yet powerful, way to interact with [reddit](http://www.reddit.com/) with Clojure. Please see the wiki for documentation.
 
-    (->> "clojure" subreddit items (map :title) (take 1000))
+## Introduction
 
-(Titles of the 1000 most "hot" items from the clojure subreddit)
+You can enter the following snippets straight into a repl, 
 
-As well as the magic of macros providing a very convenient and reliable way to play by the api rules (that is, no more than one call every two seconds):
+```clj
+(use 'reddit)
+```
 
-    (time
-      (dorun
-        (pmap #(api-call (println %)) (range 5))))
-    ;=> "Elapsed time: 8003.141613 msecs"
+Mynx is probably a little different from other reddit wrappers - but hopefully you'll like it.
 
-5 calls in 8 seconds - so it's both optimal and thread safe! (i.e. much better than using Thread/sleep)
+Although it's not necessary for just retreiving information, you may as well log in first - there's more than one way to do this but the easiest is to do it globally:
 
-## reddit objects: links and comments
+```clj
+(login! "username" "password")
+```
 
-For the most part, reddit.clj parses reddit's JSON objects directly into Clojure maps (except "listings" become lists) - so see the [reddit API docs](https://github.com/reddit/reddit/wiki/API) for info on what's available. It adds a couple of useful extra keys to comments and links, e.g. `:time`, an #instance representing the submission time. reddit.clj is very repl-friendly, so it's easy explore what's available.
+Mynx embraces URLs rather than hiding them, but they're easy to construct:
 
-    (use 'reddit 'reddit.url)
+```clj
+(->> "one_more_minute" user comments)
+;=> "http://www.reddit.com/user/one_more_minute/comments/"
 
-    (-> "clojure" subreddit items first keys)
-    ;=> (:title :author :is_self :score ...)
+(->> '[funny aww] subreddit comments)
+;=> "http://www.reddit.com/r/funny+aww/comments/"
+```
 
-    (-> "clojure" subreddit-comments items first keys)
-    ;=> (:author :body :score :permalink ...)
+Then we'll use the `items` function, which turns this URL into a lazy sequence of all items at that page. Since this could contain thousands of things, we'll just have a look at one - the current top link on r/funny:
 
-    (def l (login "username" "password"))
-    (me l)
-    ;=> {:kind :account, :comment_karma 147, :has_mail false ...}
+```clj
+(->> "funny" subreddit items first)
+;=> {:over_18 false, :banned_by nil, :is_self false, ...}
+```
 
-## api coverage
+Links and comments are just data, and almost exactly the same as reddit's JSON output. Simple. Let's find out how much karma I have:
 
-I haven't tried to cover every possible API function. Instead, I've tried to provide a nice interface to the useful stuff, as well as a solid foundation for implementing new functionality if necessary. If you do need to use the API in a new way, you should find that using abstractions like `items` alongside the lower-level functions in `reddit.core` (`get-parsed` and `post`) makes implementing it a piece of cake. Just look at `reddit.clj` itself and you'll see that almost anything can be done in four or five lines.
+```clj
+(->> "one_more_minute" user comments items (map :score) (reduce +))
+;=> 746
+```
 
-*That said*, if you'd like new features, or have written something yourself that could be included, please do [pm me](http://www.reddit.com/message/compose/?to=one_more_minute) and I'll see what I can do.
+Alright, let's try something more interesting.
 
-## formatting
+```clj
+(-> "funny" subreddit comments new-items first)
+;=> {:banned_by nil, :edited false, :kind :comment, ...}
+```
 
-`reddit.format` has some useful functions for markdown formatting.
+If this looks the same as what we've already done, it's not. Where `items` constructs a list of things already on the page, `new-items` constructs a list of items which *will* be on the page - an infinite sequence of future links/comments/whatever. Sceptical? Try this:
 
-# robbit - bots made easy
+```clj
+(->> "all" subreddit-new items (map :title) (map println) dorun)
+```
 
-**Note - robbit is deprecated and will soon be removed. I'm working on something which will let you write similar bots in a much more powerful and interesting way, so stay tuned.**
+This will print the titles of new links posted to reddit, as they appear, indefinitely (although note that you should be logged in for this to work well). You may also note that they appear in batches every two seconds - Mynx respects reddits API rules for you by default.
 
-<img src="http://i.imgur.com/l5K9A.jpg" width="200" align="right" margin="10px" />
+The really cool thing about this is that when you write a bot, for example, you don't have to think about loops or timing or any other kind of plumbing or boilerplate - you just map a function over all future comments/links, and it works. And if you do need something more complex, it's easy to drop back down to `items-after`, `items` etc. all the way to `get-parsed` for more control.
 
-Then we have `robbit`, which lets you easily make reddit bots. Here's a simple bot which replies to every new comment.
+Let's write a bot which replies to all comments in /r/sandbox containing the text "hello, bot":
 
-    (robbit/start
-      {:handler    (fn [comment]
-                     {:reply (str "Great comment, " (comment :author) "!")
-                      :vote  :up})
-       :login      (reddit/login "username" "password")})
+```clj
+(login! "username" "password")
+(set-user-agent! "Mynx Demo")
 
-That's about as simple as it gets, but you'll probably want to make use of some of the other options:
+(->> "sandbox" subreddit comments new-items
+     (filter #(re-find #"hello, bot" (:body %)))
+     (map #(reply % "    hello, human"))
+     dorun)
+```
 
-    :user-agent - Short description + main account username.
-    :type       - :comment/:link - choose which to respond to. Defaults to comment.
-    :handler    - fn to take a comment/link object and return a response map. Default just returns `nil`.
-    :subreddits - String or vector of strings. Load comments/links from here. Defaults to "all".
-    :login      - Use reddit/login to generate a login.
-    :interval   - Minutes between successive runs - default 2.
-    :last-run   - The inital run will load items up to this Date. Defaults to now.
-    :delay      - Don't respond to items until they are n minutes old - default 0.
+Neat, huh?
 
-The handler returns a map of actions, as demonstrated above - currently only `:reply` and `:vote` are supported, but it's easy to add custom responses to the multimethod - see `robbit.response` for details.
+---
 
-# more info
-
-There are both marginalia and codox docs in /docs. I've tried to keep eveything clear, but if anything isn't obvious let me know.
-
-    Copyright (c) 2012 Mike Innes
+    Copyright (c) 2013 Mike Innes
     
     MIT License
     

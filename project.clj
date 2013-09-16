@@ -1,4 +1,4 @@
-(defproject robbit "2.0.0-SNAPSHOT"
+(defproject mynx "2.0.0-SNAPSHOT"
   :description "reddit api"
   :url "https://github.com/one-more-minute/mynx"
   :license {:name "Eclipse Public License"
@@ -7,4 +7,4 @@
                  [clj-http            "0.7.5"]
                  [cheshire            "5.2.0"]
                  [slingshot          "0.10.3"]
-                 [one_more_minute/clarity "0.1.1"]])
+                 [chiara "0.2.0-SNAPSHOT"]])

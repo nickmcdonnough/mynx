@@ -1,5 +1,5 @@
 (ns reddit.format
-  (:require [clojure.string :as str]))
+  (require [clojure.string :as str]))
 
 (defn quotify
   "Format the text as a markdown quote, i.e.
@@ -34,18 +34,6 @@
   [& ss] (->> ss (filter identity) (str/join "\n\n")))
 
 (def line "---")
-
-(def Aliases
-  "The formatting functions have aliases to make
-  using them more readable.
-  ---      -   line
-  i        -   italic
-  ss       -   superscript
-  sn       -   superscript-n
-  l        -   hyperlink
-  p        -   paragraphs
-  q        -   quotify"
-  nil)
 
 (def --- line)
 (def i italic)

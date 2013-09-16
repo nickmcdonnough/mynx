@@ -2,13 +2,47 @@
   "High level interface to reddit."
   (:use [reddit core util]
          slingshot.slingshot
-         [clarity core utils])
-  (:require [clojure.string :as str ]
-            [cheshire.core  :as json]
-            [reddit.url :refer (reddit)]))
+         chiara)
+  (:require [clojure.string :as str]
+            [cheshire.core  :as json]))
 
-(use-clarity)
-(clarity
+(use-chiara) (chiara
+
+;; --------------
+;; URL generation
+;; --------------
+
+defmacro reddit
+  "Macro, turns `(reddit api eg)` into 'http://www,reddit.com/api/eg'"
+  [& rest]
+  str "http://www.reddit.com/" : str/join "/" rest
+
+defn subreddit
+  """Gives the url for the given subreddit,
+  in the form "sub", :sub, 'sub or a list."""
+  [x]
+  (cond
+    (some #(% x) [symbol? keyword? string?])
+      (str (reddit r) "/" (name x) "/")
+    :else
+      (subreddit (str/join "+" (map name x))))
+
+defn subreddit-new
+  "New links page url for a given subreddit(s)."
+  [names]
+  str (subreddit names) "new/"
+
+defn user
+  "The user's submissions."
+  [username]
+  str (reddit user) "/" username "/"
+
+defn user-about
+  [username]
+  str (reddit user) "/" username "/about/"
+
+defn comments [s]
+  str s "comments/"
 
 ;; --------------
 ;; Authentication
@@ -52,12 +86,12 @@ defn set-user-agent! [agent]
 
 defn items
   "Returns a lazy sequence of all items at the given
-  url, including subsequent pages. API calls spaced."
+  url, including subsequent pages."
   [url & {:keys [params]}]
   lazy-seq
     let [s (get-parsed url :params (merge {:limit 1000
                                            :sort  "new"}
-                                          params)))]
+                                          params))]
       if-not (empty? s)
         concat s (items url :params (assoc params :after (-> s last :name)))
 
@@ -158,9 +192,7 @@ defn reply
         #".error.DELETED_COMMENT.field-parent" :parent-deleted
         #".error.DELETED_LINK.field-parent"    :parent-deleted
         (response :body))
-    catch [:status 504] _ :timeout
     catch [:status 403] _ :forbidden
-    catch Object e e
 
 defn vote
   "Vote :up, :down, or :none on a link/comment."
@@ -186,5 +218,11 @@ defn get-user
   "Account information for a user."
   [username]
   get-parsed : str (reddit user) "/" username "/about"
+
+;; -----
+;; Utils
+;; -----
+
+def domap : comp dorun map
 
 )
