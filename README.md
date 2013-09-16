@@ -20,7 +20,7 @@ Although it's not necessary for just retreiving information, you may as well log
 (login! "username" "password")
 ```
 
-Mynx embraces URLs rather than hiding them, but they're easy to construct:
+Ok, first things first: Mynx embraces URLs rather than hiding them, but they're easy to construct:
 
 ```clj
 (->> "one_more_minute" user comments)
@@ -30,14 +30,14 @@ Mynx embraces URLs rather than hiding them, but they're easy to construct:
 ;=> "http://www.reddit.com/r/funny+aww/comments/"
 ```
 
-Then we'll use the `items` function, which turns this URL into a lazy sequence of all items at that page. Since this could contain thousands of things, we'll just have a look at one - the current top link on r/funny:
+Next we'll use the `items` function, which turns this URL into a lazy sequence of all items at that location. As this could be thousands of things, we'll just have a look at one - the current top link on r/funny:
 
 ```clj
 (->> "funny" subreddit items first)
 ;=> {:over_18 false, :banned_by nil, :is_self false, ...}
 ```
 
-Links and comments are just data, and almost exactly the same as reddit's JSON output. Simple. Let's find out how much karma I have:
+Links and comments are just data, and almost exactly the same as reddit's JSON output. Simple. Let's off how much karma I have:
 
 ```clj
 (->> "one_more_minute" user comments items (map :score) (reduce +))
@@ -47,11 +47,11 @@ Links and comments are just data, and almost exactly the same as reddit's JSON o
 Alright, let's try something more interesting.
 
 ```clj
-(-> "funny" subreddit comments new-items first)
+(->> "funny" subreddit comments new-items first)
 ;=> {:banned_by nil, :edited false, :kind :comment, ...}
 ```
 
-If this looks the same as what we've already done, it's not. Where `items` constructs a list of things already on the page, `new-items` constructs a list of items which *will* be on the page - an infinite sequence of future links/comments/whatever. Sceptical? Try this:
+This might look the same as before, but it's not. Where `items` constructs a list of things already on the page, `new-items` constructs a list of items which *will* be on the page - an infinite sequence of future links/comments/whatever. Sceptical? Try this:
 
 ```clj
 (->> "all" subreddit-new items (map :title) (map println) dorun)
