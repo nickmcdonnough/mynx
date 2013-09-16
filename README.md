@@ -37,7 +37,7 @@ Next we'll use the `items` function, which turns this URL into a lazy sequence o
 ;=> {:over_18 false, :banned_by nil, :is_self false, ...}
 ```
 
-Links and comments are just data, and almost exactly the same as reddit's JSON output. Simple. Let's off how much karma I have:
+Links and comments are just data, and almost exactly the same as reddit's JSON output. Simple. Let's show off how much karma I have:
 
 ```clj
 (->> "one_more_minute" user comments items (map :score) (reduce +))
