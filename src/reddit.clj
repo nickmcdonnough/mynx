@@ -139,7 +139,7 @@ defn author?
   the given username."
   [thing user] (= (thing :author) user)
 
-defn deleted-comment?
+defn deleted?
   "Check if a comment has been removed."
   [comment]
   or (nil? (comment :body))

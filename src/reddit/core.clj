@@ -7,6 +7,7 @@
   are built on top of these."
   (use      reddit.util
             chiara
+            chiara.threading
             slingshot.slingshot)
   (require [clj-http.client :as http]
            [cheshire.core   :as json]))
