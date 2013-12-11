@@ -32,6 +32,16 @@ defn subreddit-new
   [names]
   str (subreddit names) "new/"
 
+defn subreddit-top
+  "Top links page url for a given subreddit(s)."
+  [names]
+  str (subreddit names) "top/"
+
+defn subreddit-comments
+  "New comments page url for a given subreddit(s)."
+  [names]
+  str (subreddit names) "comments/"
+
 defn user
   "The user's submissions."
   [username]
@@ -41,8 +51,8 @@ defn user-about
   [username]
   str (reddit user) "/" username "/about/"
 
-defn comments [s]
-  str s "comments/"
+defn user-comments [username]
+  str (user username) "comments/"
 
 ;; --------------
 ;; Authentication

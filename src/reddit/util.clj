@@ -1,5 +1,8 @@
 (ns reddit.util
-  (use chiara.threading))
+  (use chiara
+       chiara.threading))
+
+(use-chiara) (chiara
 
 (defn filter-map [f map]
   (into {} (filter f map)))
@@ -25,3 +28,14 @@
   (let [opts (last    args)
         args (butlast args)]
     (apply f (concat args (reduce concat opts)))))
+
+let [xs (atom [nil #{}])]
+  defn repeat? [x]
+    first
+      swap! xs
+        λ [[_ xs]]
+          if (xs x)
+            [true xs]
+            [false (conj xs x)]
+
+)
