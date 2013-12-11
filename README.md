@@ -2,7 +2,7 @@
 
     [mynx "2.0.0-SNAPSHOT"]
 
-Mynx is an easy, yet powerful, way to interact with [reddit](http://www.reddit.com/) with Clojure. Please see the wiki for documentation.
+Mynx is an easy, yet powerful, way to interact with [reddit](http://www.reddit.com/) with Clojure. Please see the [wiki](https://github.com/one-more-minute/mynx/wiki) for documentation.
 
 ## Introduction
 
@@ -23,10 +23,10 @@ Although it's not necessary for just retreiving information, you may as well log
 Ok, first things first: Mynx embraces URLs rather than hiding them, but they're easy to construct:
 
 ```clj
-(->> "one_more_minute" user comments)
+(user-comments "one_more_minute")
 ;=> "http://www.reddit.com/user/one_more_minute/comments/"
 
-(->> '[funny aww] subreddit comments)
+(subreddit-comments '[funny aww])
 ;=> "http://www.reddit.com/r/funny+aww/comments/"
 ```
 
@@ -40,14 +40,14 @@ Next we'll use the `items` function, which turns this URL into a lazy sequence o
 Links and comments are just data, and almost exactly the same as reddit's JSON output. Simple. Let's show off how much karma I have:
 
 ```clj
-(->> "one_more_minute" user comments items (map :score) (reduce +))
+(->> "one_more_minute" user-comments items (map :score) (reduce +))
 ;=> 746
 ```
 
 Alright, let's try something more interesting.
 
 ```clj
-(->> "funny" subreddit comments new-items first)
+(->> "funny" subreddit-comments new-items first)
 ;=> {:banned_by nil, :edited false, :kind :comment, ...}
 ```
 
@@ -67,7 +67,7 @@ Let's write a bot which replies to all comments in /r/sandbox containing the tex
 (login! "username" "password")
 (set-user-agent! "Mynx Demo")
 
-(->> "sandbox" subreddit comments new-items
+(->> "sandbox" subreddit-comments new-items
      (filter #(re-find #"hello, bot" (:body %)))
      (map #(reply % "    hello, human"))
      dorun)
