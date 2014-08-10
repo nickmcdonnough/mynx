@@ -93,7 +93,7 @@ def ^:dynamic *api-spacer* (spacer 2000)
 
 def ^:dynamic *user-agent*
   "A user agent string used by `request`."
-  "reddit.clj"
+  "Mynx, reddit API for Clojure"
 
 def ^:dynamic *login* nil
 
