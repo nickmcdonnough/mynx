@@ -10,7 +10,8 @@
             chiara.threading
             slingshot.slingshot)
   (require [org.httpkit.client :as http]
-           [cheshire.core   :as json]))
+           [cheshire.core   :as json]
+           [clojure.pprint :refer [pprint]]))
 
 (use-chiara) (chiara
 
@@ -49,8 +50,7 @@ defmethod parse :atom [a] a
 ;; If a form is not recognised, it is printed and becomes nil.
 defmethod parse :default [thing]
   println "Error parsing form:"
-  clojure.pprint/pprint thing
-  nil
+  pprint thing
 
 ;; Listing objects are converted into lists.
 defmethod parse "Listing" [{listing :data}]
