@@ -60,8 +60,7 @@ defn user-comments [username]
 
 defn login
   "Returns a login object (`{:name :cookie :modhash}`)
-  for passing to the request functions. If login
-  fails, it will contain an :errors key."
+  for passing to the request functions."
   [user pass]
   let [response (post (reddit api login) :params {:user user
                                                   :passwd pass
