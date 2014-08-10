@@ -11,3 +11,4 @@ pom.xml
 *.sublime-workspace
 log.txt
 .lein-repl-history
+.nrepl-port
