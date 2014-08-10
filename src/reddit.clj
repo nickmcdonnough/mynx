@@ -63,13 +63,14 @@ defn login
   for passing to the request functions. If login
   fails, it will contain an :errors key."
   [user pass]
-  let [response (post (reddit api login)
-                      :params {"user" user, "passwd" pass, "api_type" "json"})
+  let [response (post (reddit api login) :params {"user" user
+                                                  "passwd" pass
+                                                  "api_type" "json"})
        {:keys [errors data] :as response-json}
                 (-> response :body (json/decode true) :json)]
     (cond
       ; Successful
-      (data :modhash) {:name    user
+      (:modhash data) {:name    user
                        :cookies (response :cookies)
                        :modhash (data :modhash)}
       ; Unsuccessful
