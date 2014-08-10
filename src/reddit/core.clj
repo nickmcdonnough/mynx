@@ -9,7 +9,7 @@
             chiara
             chiara.threading
             slingshot.slingshot)
-  (require [clj-http.client :as http]
+  (require [org.httpkit.client :as http]
            [cheshire.core   :as json]))
 
 (use-chiara) (chiara
@@ -106,13 +106,14 @@ defn request
   [method url & {:keys [params login user-agent] :as opts}]
   try+
     spaced *api-spacer*
-      http/request {:method        method
-                    :url           url
-                    :headers       {"User-Agent" (or user-agent *user-agent*)}
-                    :cookies       (:cookies (or login *login*))
-                    :query-params  (merge {:uh (:modhash (or login *login*))
-                                           :rand-int (rand-int 1000000)}
-                                          params)}
+      deref
+        http/request {:method        method
+                      :url           url
+                      :headers       {"User-Agent" (or user-agent *user-agent*)}
+                      :cookies       (:cookies (or login *login*))
+                      :query-params  (merge {:uh (:modhash (or login *login*))
+                                             :rand-int (rand-int 1000000)}
+                                            params)}
 
     ; catch [:status 504] _ (Thread/sleep 2000) (apply-opts request method url opts)
     ; catch [:status 500] _ (Thread/sleep 2000) (apply-opts request method url opts)
