@@ -68,16 +68,18 @@ defn login
                                                   :api_type "json"})
        {:keys [errors data] :as response-json}
                 (-> response :body (json/decode true) :json)]
-    (cond
-      ; Successful
-      (:modhash data) {:name    user
-                       :cookies (response :cookies)
-                       :modhash (data :modhash)}
-      ; Unsuccessful
-      (seq errors)    response-json
-      :else           {:errors  :unknown
-                       :reponse response
-                       :data    response-json})
+    if (:modhash data)
+      {:name    user
+       :cookies (response :cookies)
+       :modhash (data :modhash)}
+    throw+
+      merge
+        if (seq errors)
+          response-json
+          {:errors  :unknown
+           :reponse response
+           :data    response-json}
+        {:login-error true}
 
 defn login-success?
   "If the login was successful, returns it.
