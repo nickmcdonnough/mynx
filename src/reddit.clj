@@ -227,8 +227,7 @@ defn me
   "Data about the currently logged in user
   from `/api/me.json`."
   [& [login]]
-  get-parsed (reddit api me)
-             :login (or login *login*)
+  get-parsed (reddit api me) :login login
 
 defn get-user
   "Account information for a user."
