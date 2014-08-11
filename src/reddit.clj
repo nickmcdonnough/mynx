@@ -58,6 +58,10 @@ defn user-comments [username]
 ;; Authentication
 ;; --------------
 
+; http-kit doesn't support cookies directly, so we pull them out manually.
+defn ^:private cookie [resp]
+  -> resp :headers :set-cookie first (clojure.string/split #";") first
+
 defn login
   "Returns a login object (`{:name :cookie :modhash}`)
   for passing to the request functions."
@@ -69,7 +73,7 @@ defn login
        data (:data response-json)]
     if (:modhash data)
       {:name    user
-       :cookies (response :cookies)
+       :cookies (cookie response) ;(response :cookies)
        :modhash (data :modhash)}
       throw+
         merge

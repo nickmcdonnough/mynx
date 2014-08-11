@@ -109,11 +109,13 @@ defn request
       deref
         http/request {:method        method
                       :url           url
-                      :headers       {"User-Agent" (or user-agent *user-agent*)}
-                      :cookies       (:cookies (or login *login*))
-                      :query-params  (merge {:uh (:modhash (or login *login*))
-                                             :rand-int (rand-int 1000000)}
-                                            params)}
+                      :headers       (merge {"User-Agent" (or user-agent *user-agent*)}
+                                            (if-let [login (or login *login*)]
+                                              {"Cookie" (login :cookies) ; see login
+                                               "X-Modhash"  (login :modhash)}
+                                              {}))
+                      ;:cookies       (:cookies (or login *login*))
+                      :query-params  (assoc params :rand-int (rand-int 1000000))}
 
     ; catch [:status 504] _ (Thread/sleep 2000) (apply-opts request method url opts)
     ; catch [:status 500] _ (Thread/sleep 2000) (apply-opts request method url opts)
