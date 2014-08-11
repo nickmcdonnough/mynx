@@ -65,20 +65,20 @@ defn login
   let [response (post (reddit api login) :params {:user user
                                                   :passwd pass
                                                   :api_type "json"})
-       {:keys [errors data] :as response-json}
-                (-> response :body (json/decode true) :json)]
+       response-json (-> response :body (json/decode true) :json)
+       data (:data response-json)]
     if (:modhash data)
       {:name    user
        :cookies (response :cookies)
        :modhash (data :modhash)}
-    throw+
-      merge
-        if (seq errors)
-          response-json
-          {:errors  :unknown
-           :reponse response
-           :data    response-json}
-        {:login-error true}
+      throw+
+        merge
+          if (seq (:errors response-json))
+            response-json
+            {:errors  :unknown
+             :reponse response
+             :data    response-json}
+          {:login-error true}
 
 defn login-success?
   "If the login was successful, returns it.
