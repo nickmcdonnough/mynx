@@ -1,4 +1,4 @@
-(defproject mynx "2.0.0-SNAPSHOT"
+(defproject mynx "2.0.0"
   :description "reddit api"
   :url "https://github.com/one-more-minute/mynx"
   :license {:name "Eclipse Public License"
