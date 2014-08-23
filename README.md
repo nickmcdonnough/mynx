@@ -4,9 +4,11 @@
 
 Mynx is an easy, yet powerful, way to interact with [reddit](http://www.reddit.com/) with Clojure. Please see the [wiki](https://github.com/one-more-minute/mynx/wiki) for documentation.
 
+Mynx powers [Marvin](http://github.com/one-more-minute/The-Paranoid-Android), a bot which has served /r/scp reliably for the past two years or so now.
+
 ## Introduction
 
-You can enter the following snippets straight into a repl, 
+You can enter the following snippets straight into a repl.
 
 ```clj
 (use 'reddit)
@@ -74,28 +76,3 @@ Let's write a bot which replies to all comments in /r/sandbox containing the tex
 ```
 
 Neat, huh?
-
----
-
-    Copyright (c) 2013 Mike Innes
-    
-    MIT License
-    
-    Permission is hereby granted, free of charge, to any person obtaining
-    a copy of this software and associated documentation files (the
-    "Software"), to deal in the Software without restriction, including
-    without limitation the rights to use, copy, modify, merge, publish,
-    distribute, sublicense, and/or sell copies of the Software, and to
-    permit persons to whom the Software is furnished to do so, subject to
-    the following conditions:
-    
-    The above copyright notice and this permission notice shall be
-    included in all copies or substantial portions of the Software.
-    
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
