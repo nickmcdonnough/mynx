@@ -7,4 +7,4 @@
                  [cheshire            "5.3.1"]
                  [slingshot          "0.10.3"]
                  [http-kit           "2.1.18"]
-                 [chiara "0.2.0-SNAPSHOT"]])
+                 [chiara              "0.2.0"]])
