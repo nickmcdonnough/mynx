@@ -1,6 +1,6 @@
 # Mynx
 
-    [mynx "2.0.0-SNAPSHOT"]
+    [mynx "2.0.0"]
 
 Mynx is an easy, yet powerful, way to interact with [reddit](http://www.reddit.com/) with Clojure. Please see the [wiki](https://github.com/one-more-minute/mynx/wiki) for documentation.
 
